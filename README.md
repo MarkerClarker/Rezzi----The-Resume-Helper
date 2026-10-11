@@ -1,7 +1,5 @@
 # Rezzi----The-Resume-Helper
 
-# Rezzi
-
 Rezzi is a resume-analysis assistant that accepts a PDF resume, identifies or accepts a target role, gathers publicly available job-requirement information, compares the resume with those requirements using Google Gemini, and provides a follow-up career chatbot.
 
 The interface is styled after Windows 95, Wii, and Frutiger Aero design: gradient skies, glass-like bubbles, beveled controls, compact desktop-window chrome, and a small Pong animation during analysis.
