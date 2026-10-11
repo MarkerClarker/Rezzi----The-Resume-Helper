@@ -1,4 +1,4 @@
-# Rezzi----The-Resume-Helper
+# Rezzi--The-Resume-Helper
 
 Rezzi is a resume-analysis assistant that accepts a PDF resume, identifies or accepts a target role, gathers publicly available job-requirement information, compares the resume with those requirements using Google Gemini, and provides a follow-up career chatbot.
 
