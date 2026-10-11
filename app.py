@@ -20,6 +20,7 @@ import os
 import re
 import shutil
 import threading
+import time
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -219,16 +220,52 @@ def chat():
         prompt += f"Previous conversation:\n{conv}\n\n"
     prompt += f"User: {message}"
 
-    try:
-        resp = _gemini.models.generate_content(
-            model=GEMINI_MODEL,
-            contents=[resume_part, prompt],
-        )
-        return jsonify({
-            "response": resp.text or "I could not generate a response."
-        })
-    except Exception as exc:
-        return jsonify({"error": str(exc)}), 500
+    # Gemini can temporarily return 503 when the selected model is busy.
+    # Retry a few times before reporting the error to the browser.
+    retry_delays = [3, 8, 15]
+    response = None
+
+    for attempt, delay in enumerate(retry_delays, start=1):
+        try:
+            print(f"[Chat] Contacting Gemini (attempt {attempt}/{len(retry_delays)})")
+            response = _gemini.models.generate_content(
+                model=GEMINI_MODEL,
+                contents=[resume_part, prompt],
+            )
+            break
+
+        except Exception as exc:
+            error_text = str(exc)
+            temporary = any(
+                marker in error_text.lower()
+                for marker in (
+                    "503",
+                    "unavailable",
+                    "high demand",
+                    "temporarily",
+                    "429",
+                    "resource_exhausted",
+                )
+            )
+
+            if not temporary or attempt == len(retry_delays):
+                print(f"[Chat] Gemini error: {type(exc).__name__}: {exc}")
+                return jsonify({
+                    "error": (
+                        "Gemini is temporarily unavailable. Please try again "
+                        "in a moment."
+                    )
+                }), 503
+
+            print(f"[Chat] Gemini is busy; retrying in {delay} seconds.")
+            time.sleep(delay)
+
+    if response is None or not response.text:
+        return jsonify({"error": "Gemini returned an empty response."}), 502
+
+    return jsonify({
+        "response": response.text
+    })
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -288,7 +325,7 @@ def _pipeline_worker(job_title: str) -> None:
         if output_path is None:
             _state.update(
                 status="error",
-                error="The analysis returned no output.",
+                error="Gemini could not complete the analysis. Check your API key and quota.",
             )
             return
 

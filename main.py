@@ -6,8 +6,9 @@ run_resume_analysis()    → read CSV + PDF, call Gemini, save analysis.txt
 """
 
 import re
-import requests
 from pathlib import Path
+
+import requests
 
 from API_comparison import (
     analyze_resume,
@@ -23,6 +24,8 @@ from web_scraping import (
     save_csv,
     scrape_page,
     search_web,
+)
+from web_scraping import (
     remove_duplicates as ws_dedup,
 )
 

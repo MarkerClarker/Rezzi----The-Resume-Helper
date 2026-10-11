@@ -1,0 +1,7 @@
+• Match Score: 68/100 — You have solid foundational data analysis and scripting skills through your coursework and scraping project, but your profile currently lacks SQL, professional experience, and security-specific credentials.
+
+• Strongest Matches: Data collection, cleaning, and visualization are strongly supported by your Python web scraper project using Pandas and Matplotlib. Fundamental problem-solving, documentation, and statistics are also strongly supported by your project details and 4.0 GPA academic coursework.
+
+• Gaps: SQL proficiency is not found in your resume, despite being essential for querying security logs. Communicating analytical findings to non-technical stakeholders is present but weakly documented, appearing only as an uncontextualized soft skill. Additionally, industry-standard certifications (such as CompTIA Security+) and professional years of experience are not found in your resume.
+
+• Action Steps: Immediately, learn fundamental SQL and incorporate query examples into your projects or skills list. For the next application cycle, build a hands-on home lab project (such as analyzing network traffic with Wireshark or setting up a basic SIEM like Splunk) to show applied security analysis. Long-term, pursue a foundational security certification and target SOC internships as you progress through your degree.
