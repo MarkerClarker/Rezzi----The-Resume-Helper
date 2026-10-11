@@ -1,8 +1,8 @@
 # Rezzi--The-Resume-Helper
 
-Rezzi is a resume-analysis assistant that accepts a PDF resume, identifies or accepts a target role, gathers publicly available job-requirement information, compares the resume with those requirements using Google Gemini, and provides a follow-up career chatbot.
+Rezzi is a resume-analysis assistant that accepts a resume (only as a PDF), identifies or accepts an inputted target role, gathers publicly available job-requirement information, compares the resume with those requirements using Google Gemini, and provides a follow-up career chatbot.
 
-The interface is styled after Windows 95, Wii, and Frutiger Aero design: gradient skies, glass-like bubbles, beveled controls, compact desktop-window chrome, and a small Pong animation during analysis.
+The interface is styled after Windows 95, Wii, and Frutiger Aero design aesthetics.
 
 ## Features
 
@@ -10,8 +10,8 @@ The interface is styled after Windows 95, Wii, and Frutiger Aero design: gradien
 - Optional target-job input.
 - Automatic target-role detection from the resume when no role is supplied.
 - DuckDuckGo-powered job-requirement searches.
-- HTML parsing and requirement extraction with fallback role-based requirements when pages cannot be accessed.
-- Gemini-powered resume-to-requirements comparison and score.
+- HTML parsing and requirement extraction.
+- Gemini-API-powered resume-to-requirements comparison and score.
 - Results page with printable analysis.
 - Resume-aware chatbot for career questions and resume feedback.
 - Local output files for scraped requirements and the generated analysis.
@@ -40,7 +40,7 @@ rezzi/
 - Python 3.10 or newer is recommended.
 - A Google Gemini API key.
 - Internet access for web searches and Gemini requests.
-- A PDF resume.
+- A PDF-only resume.
 
 ## Installation
 
@@ -76,7 +76,7 @@ Create a `.env` file beside `app.py`:
 
 ```env
 GEMINI_API_KEY=your_google_gemini_api_key
-GEMINI_MODEL=gemini-2.0-flash
+GEMINI_MODEL=gemini-3.8-flash
 ```
 
 `GEMINI_MODEL` is optional. If omitted, Rezzi uses the default configured in `API_comparison.py` and `app.py`.
@@ -111,41 +111,6 @@ http://127.0.0.1:5000
 10. The result is saved to `outputs/analysis.txt` and displayed at `/interact`.
 11. The chatbot at `/chatbot` sends the resume and conversation context to Gemini for follow-up questions.
 
-## Main routes
-
-| Route | Method | Purpose |
-|---|---:|---|
-| `/` | GET | Resume upload page |
-| `/loading` | GET | Progress page and Pong animation |
-| `/interact` | GET | Analysis results |
-| `/chatbot` | GET | Resume-aware chatbot |
-| `/health` | GET | Server and resume availability check |
-| `/api/upload` | POST | Upload a PDF and start analysis |
-| `/api/status` | GET | Check pipeline status |
-| `/api/analysis` | GET | Retrieve the completed analysis |
-| `/chat` | POST | Submit a chatbot message |
-
-## Search-volume controls
-
-Search volume can be reduced in `web_scraping.py`:
-
-```python
-SEARCH_QUERIES = [
-    "{} job requirements qualifications skills",
-    "{} required skills experience education job posting",
-]
-
-def search_web(job_title: str, results_per_query: int = 6):
-```
-
-The number of pages scraped can be limited in `main.py` by slicing the links before the scraping loop:
-
-```python
-MAX_PAGES_TO_SCRAPE = 8
-links = links[:MAX_PAGES_TO_SCRAPE]
-```
-
-Lower values reduce runtime, network traffic, and the number of pages processed.
 
 ## Attribution and technology disclosure
 
@@ -158,7 +123,7 @@ Rezzi uses the **Google Gemini API** through the official `google-genai` Python 
 - Producing the match score, strengths, gaps, and recommendations.
 - Answering chatbot questions using the uploaded resume as context.
 
-Google Gemini is a third-party generative-AI service. Its availability, model names, pricing, quotas, terms, and data-handling practices are controlled by Google and may change. Users should review Google's current Gemini API documentation and terms before deployment.
+*The developers of Rezzi do not own Gemini, so all copyright hereby belongs to its creators*
 
 ### DuckDuckGo search
 
@@ -198,9 +163,7 @@ The frontend uses standard HTML, CSS, and browser JavaScript. It does not requir
 
 This project was developed with assistance from **OpenAI ChatGPT** for code generation, debugging suggestions, refactoring, interface design, and documentation drafting.
 
-ChatGPT is a development aid in this project. **Rezzi does not call the OpenAI API at runtime.** Runtime generative-AI requests are sent to Google Gemini through the `google-genai` SDK. OpenAI trademarks and services are not presented as part of Rezzi's runtime architecture.
-
-AI-generated code and recommendations should be reviewed, tested, and adapted by the project maintainer. ChatGPT assistance does not replace security review, legal review, accessibility testing, or verification of third-party licenses and API terms.
+ChatGPT aided in the development of this project. **Note: Rezzi does not call the OpenAI API at runtime.** Runtime generative-AI requests are handled by Google Gemini through the `google-genai` SDK. 
 
 ## Privacy and security notes
 
@@ -209,15 +172,15 @@ AI-generated code and recommendations should be reviewed, tested, and adapted by
 - Do not use this application with passwords, Social Security numbers, protected health information, restricted student records, or other data that the deployment environment is not authorized to process.
 - The development server is intended for local use. It is not a production security configuration.
 - Add authentication, HTTPS, request limits, CSRF protection, strict CORS origins, file scanning, encrypted storage, and retention controls before public deployment.
-- Do not expose API keys in frontend code, Git repositories, screenshots, logs, or error messages.
+- Do NOT expose API keys in frontend code, Git repositories, screenshots, logs, or error messages (bad stuff will happen).
 
 ## Limitations
 
 - Search results and job postings can be unavailable, blocked, outdated, duplicated, or unrelated.
-- HTML extraction is heuristic and will not work reliably on every website.
+- HTML extraction will not work reliably on every website.
 - Fallback requirements are general role-based guidance, not requirements from a specific employer.
-- Gemini may make mistakes. It must not be treated as the final authority for hiring decisions, licensing, eligibility, or career advice.
-- The match score is an AI-generated estimate, not a validated employment assessment.
+- Gemini may make mistakes. Take its suggestions with a grain of salt. 
+- The match score is an estimate, not a guarentee or a validated employment assessment.
 - The current pipeline keeps status in process memory and is intended for one local server process.
 
 ## License and third-party licenses
@@ -226,15 +189,4 @@ No project license is specified by this repository. Unless a separate license fi
 
 The dependencies listed in `requirements.txt` are separate third-party projects and retain their own licenses. Before redistribution, review the current license and attribution requirements for Flask, Flask-CORS, google-genai, python-dotenv, Requests, Beautiful Soup 4, duckduckgo-search, and Werkzeug. Dependency licenses should not be assumed from this README.
 
-## Suggested production checklist
-
-- Pin tested dependency versions.
-- Add automated tests for upload validation, scraper parsing, fallback behavior, and API failures.
-- Replace the in-memory state object with a task queue or database-backed job system.
-- Add authentication and authorization.
-- Restrict CORS to the deployed frontend origin.
-- Add upload size limits and malware scanning.
-- Redact sensitive data from logs.
-- Add clear user consent before sending resume contents to Gemini.
-- Provide a way to delete uploaded resumes and generated reports.
-- Review third-party API, search-engine, and website terms before deployment.
+**Thank you for your interest in Rezzi!**
