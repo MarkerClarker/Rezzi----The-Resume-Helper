@@ -76,6 +76,17 @@ body::before{
     border:2px solid;border-color:white var(--dark) var(--dark) white;
     color:#000;background:var(--gray);font:bold .75rem Arial;
 }
+.close-control{
+    padding:0;
+    cursor:pointer;
+}
+.close-control:hover{
+    color:#fff;
+    background:#b03030;
+}
+.close-control:active{
+    border-color:var(--dark) white white var(--dark);
+}
 .window-body{padding:8px;}
 .panel{
     padding:30px clamp(14px,5vw,52px) 38px;
@@ -106,6 +117,15 @@ h1{
 #pongCanvas{display:block;max-width:100%;cursor:none;}
 
 /* ── Status bar ──────────────────────────────────────────────────── */
+.scoreboard{
+    display:flex;justify-content:center;gap:12px;margin-top:12px;
+}
+.scoreboard span{
+    min-width:130px;padding:6px 10px;text-align:center;
+    border:2px solid;border-color:#808080 white white #808080;
+    color:#20516b;background:#d8ffff;font:bold .8rem Tahoma,sans-serif;
+}
+
 .status-bar{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
 .status-bar span{
     flex:1 1 200px;padding:5px 8px;
@@ -144,10 +164,8 @@ h1{
       <span class="title-icon">R</span>
       <span>Rezzi — Analyzing Your Resume</span>
     </div>
-    <div class="controls" aria-hidden="true">
-      <span class="control">_</span>
-      <span class="control">□</span>
-      <span class="control">×</span>
+    <div class="controls">
+      <button class="control close-control" type="button" aria-label="Close Rezzi window" title="Close" onclick="closeRezzi()">×</button>
     </div>
   </header>
 
@@ -166,6 +184,11 @@ h1{
       <canvas id="pongCanvas" width="560" height="280"></canvas>
     </div>
 
+    <div class="scoreboard" aria-live="polite">
+      <span>You: <strong id="player-score">0</strong></span>
+      <span>Rezzi AI: <strong id="ai-score">0</strong></span>
+    </div>
+
     <div class="status-bar">
       <span>Connection: Local server</span>
       <span id="status-text">Status: Starting…</span>
@@ -181,6 +204,12 @@ h1{
 </main>
 
 <script>
+function closeRezzi() {
+    // Browsers normally block scripts from closing tabs they did not open.
+    // Returning to Rezzi's start page provides a reliable close behavior.
+    window.location.href = "/";
+}
+
 /* ════════════════════════════════════════════════════════
    Pong
    ════════════════════════════════════════════════════════ */
@@ -190,6 +219,10 @@ const ctx = cv.getContext("2d");
 let bx = cv.width/2, by = cv.height/2, bdx = 4, bdy = 3.5;
 const PH = 64, PW = 10;
 let p1y = (cv.height-PH)/2, p2y = (cv.height-PH)/2;
+let playerScore = 0;
+let aiScore = 0;
+const playerScoreEl = document.getElementById("player-score");
+const aiScoreEl = document.getElementById("ai-score");
 
 cv.addEventListener("mousemove", e => {
     const r = cv.getBoundingClientRect();
@@ -209,18 +242,34 @@ function movePong() {
         if (by > p1y && by < p1y+PH) {
             bdx = Math.abs(bdx);
             bdy = (by - (p1y+PH/2)) * 0.22;
-        } else if (bx < 0) resetBall();
+        } else if (bx < 0) {
+            aiScore++;
+            updateScore();
+            resetBall();
+        }
     }
     if (bx >= cv.width-PW) {
         if (by > p2y && by < p2y+PH) {
             bdx = -Math.abs(bdx);
             bdy = (by - (p2y+PH/2)) * 0.22;
-        } else if (bx > cv.width) resetBall();
+        } else if (bx > cv.width) {
+            playerScore++;
+            updateScore();
+            resetBall();
+        }
     }
     if (by <= 0 || by >= cv.height) bdy = -bdy;
 }
+function updateScore() {
+    playerScoreEl.textContent = playerScore;
+    aiScoreEl.textContent = aiScore;
+}
+
 function resetBall() {
-    bx = cv.width/2; by = cv.height/2; bdy = 3.5; bdx = -bdx;
+    bx = cv.width/2;
+    by = cv.height/2;
+    bdy = 3.5;
+    bdx = -bdx;
 }
 function drawPong() {
     ctx.fillStyle = "#000"; ctx.fillRect(0,0,cv.width,cv.height);

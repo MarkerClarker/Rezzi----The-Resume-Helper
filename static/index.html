@@ -76,6 +76,17 @@ body::before{
     border:2px solid;border-color:white var(--dark) var(--dark) white;
     color:#000;background:var(--gray);font:bold .75rem Arial;
 }
+.close-control{
+    padding:0;
+    cursor:pointer;
+}
+.close-control:hover{
+    color:#fff;
+    background:#b03030;
+}
+.close-control:active{
+    border-color:var(--dark) white white var(--dark);
+}
 .window-body{padding:8px;}
 .panel{
     padding:30px clamp(14px,5vw,52px) 38px;
@@ -174,10 +185,8 @@ h1{
       <span class="title-icon">R</span>
       <span>Rezzi Resume Assistant</span>
     </div>
-    <div class="controls" aria-hidden="true">
-      <span class="control">_</span>
-      <span class="control">□</span>
-      <span class="control">×</span>
+    <div class="controls">
+      <button class="control close-control" type="button" aria-label="Close Rezzi window" title="Close" onclick="closeRezzi()">×</button>
     </div>
   </header>
 
@@ -241,6 +250,10 @@ h1{
 </main>
 
 <script>
+function closeRezzi() {
+    window.close();
+}
+
 const dropZone  = document.getElementById("drop-zone");
 const fileInput = document.getElementById("file-input");
 const dropLabel = document.getElementById("drop-label");

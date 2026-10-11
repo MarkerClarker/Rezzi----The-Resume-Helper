@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Launch Rezzi</title>
+</head>
+<body>
+    <button id="launch-button">Open Rezzi</button>
+
+    <script>
+        document.getElementById("launch-button").addEventListener("click", () => {
+            const rezziWindow = window.open(
+                "http://127.0.0.1:5000/",
+                "RezziWindow",
+                "width=1200,height=900,resizable=yes"
+            );
+
+            if (!rezziWindow) {
+                alert("Your browser blocked the Rezzi window. Please allow pop-ups.");
+                return;
+            }
+
+            window.close();
+        });
+    </script>
+</body>
+</html>

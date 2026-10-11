@@ -76,6 +76,17 @@ body::before{
     border:2px solid;border-color:white var(--dark) var(--dark) white;
     color:#000;background:var(--gray);font:bold .75rem Arial;
 }
+.close-control{
+    padding:0;
+    cursor:pointer;
+}
+.close-control:hover{
+    color:#fff;
+    background:#b03030;
+}
+.close-control:active{
+    border-color:var(--dark) white white var(--dark);
+}
 .window-body{padding:8px;}
 .panel{
     padding:30px clamp(14px,5vw,52px) 38px;
@@ -192,9 +203,7 @@ button:active,.button:active{
       <span>Rezzi Resume Assistant</span>
     </div>
     <div class="controls">
-      <span class="control">_</span>
-      <span class="control">□</span>
-      <span class="control">×</span>
+      <button class="control close-control" type="button" aria-label="Close Rezzi window" title="Close" onclick="closeRezzi()">×</button>
     </div>
   </header>
 
@@ -239,6 +248,10 @@ button:active,.button:active{
 </main>
 
 <script>
+function closeRezzi() {
+    window.close();
+}
+
 const container  = document.getElementById("text-container");
 const statusEl   = document.getElementById("loading-status");
 
