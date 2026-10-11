@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rezzi — Resume Analyzer</title>
+<style>
+:root{--gray:#c0c0c0;--dark:#404040;--blue:#075b9d;--ink:#082f4d;}
+*{box-sizing:border-box;}
+
+body{
+    min-height:100vh;margin:0;padding:25px 12px;overflow-x:hidden;
+    color:var(--ink);font-family:"Trebuchet MS",Arial,sans-serif;
+    background:
+        radial-gradient(circle at 15% 12%,#ffffff65,transparent 24%),
+        radial-gradient(circle at 88% 82%,#00f5ff66,transparent 32%),
+        linear-gradient(135deg,#076e9d,#12b9dc 45%,#13e8ed);
+    animation:glow 12s ease-in-out infinite alternate;
+}
+@keyframes glow{
+    from{background-position:0 0,100% 100%,0 50%;}
+    to  {background-position:8% 4%,92% 94%,100% 50%;}
+}
+body::before{
+    content:"";position:fixed;z-index:-5;inset:-10% auto -10% -8%;
+    width:58%;opacity:.3;pointer-events:none;
+    background:repeating-linear-gradient(58deg,
+        transparent 0 70px,#dffaff 70px 105px,transparent 105px 165px);
+    clip-path:polygon(0 0,100% 0,88% 100%,0 100%);
+}
+.bubble{
+    position:fixed;z-index:-2;border:2px solid #ffffff88;border-radius:50%;
+    pointer-events:none;opacity:.6;
+    background:radial-gradient(circle at 28% 23%,#ffffffd9,
+        #ffffff33 18%,#4be8ff2e 55%,#ffffff0a 75%);
+    box-shadow:inset -15px -18px 25px #005b9d24,0 12px 30px #00417826;
+    animation:float 11s ease-in-out infinite;
+}
+.bubble::before{
+    content:"";position:absolute;top:17%;left:18%;
+    width:27%;height:12%;border-radius:50%;
+    background:#ffffff99;transform:rotate(-35deg);
+}
+.b1{width:130px;height:130px;left:4%;bottom:13%;}
+.b2{width:62px;height:62px;left:25%;bottom:8%;opacity:.45;animation-delay:2s;}
+.b3{width:96px;height:96px;right:7%;top:18%;animation-delay:1s;}
+.b4{width:38px;height:38px;right:23%;bottom:24%;opacity:.4;animation-delay:3s;}
+@keyframes float{50%{transform:translate(8px,-18px);}}
+
+.page{width:min(100%,700px);margin:auto;}
+.window{
+    overflow:hidden;border:2px solid var(--dark);background:var(--gray);
+    box-shadow:3px 3px #000,0 20px 50px #002d5a4d;
+    animation:enter .7s ease-out both;
+}
+@keyframes enter{
+    from{opacity:0;transform:translateY(12px) scale(.985);}
+    to  {opacity:1;transform:translateY(0)    scale(1);   }
+}
+.titlebar{
+    display:flex;align-items:center;justify-content:space-between;
+    min-height:34px;padding:4px 7px;color:white;
+    background:linear-gradient(to right,#064c96,#169bd1 65%,#0a62a9);
+    font:bold .9rem Tahoma,sans-serif;
+}
+.title-text{display:flex;align-items:center;gap:8px;}
+.title-icon{
+    display:grid;width:19px;height:19px;place-items:center;
+    border:1px solid white;border-radius:3px;
+    color:var(--blue);background:linear-gradient(#fff,#a5f6ff);
+    font-size:.75rem;
+}
+.controls{display:flex;gap:3px;}
+.control{
+    display:grid;width:22px;height:20px;place-items:center;
+    border:2px solid;border-color:white var(--dark) var(--dark) white;
+    color:#000;background:var(--gray);font:bold .75rem Arial;
+}
+.window-body{padding:8px;}
+.panel{
+    padding:30px clamp(14px,5vw,52px) 38px;
+    border:2px solid;border-color:#808080 white white #808080;
+    background:linear-gradient(145deg,#fffffff2,#ddfff4f0);
+}
+.brand{
+    color:var(--blue);font-size:.75rem;font-weight:bold;
+    letter-spacing:.2em;text-align:center;text-transform:uppercase;
+}
+h1{
+    margin:8px 0 0;color:#087caf;
+    font-size:clamp(2.2rem,7vw,3.8rem);
+    line-height:.95;letter-spacing:-.09em;text-align:center;
+    text-shadow:0 3px white,0 5px #006c9d29;
+}
+.subtitle{
+    max-width:580px;margin:14px auto 22px;
+    color:#39718b;line-height:1.5;text-align:center;font-size:.95rem;
+}
+
+/* ── Form ──────────────────────────────────────────────────────── */
+.field{margin-bottom:16px;text-align:left;}
+.field label{
+    display:block;margin-bottom:5px;color:#20516b;
+    font-size:.78rem;font-weight:bold;
+    letter-spacing:.04em;text-transform:uppercase;
+}
+.field input[type="text"]{
+    width:100%;padding:9px 12px;outline:none;
+    border:2px solid;border-color:#808080 white white #808080;
+    color:var(--ink);background:white;
+    font:.92rem "Trebuchet MS",Arial,sans-serif;
+}
+.field input[type="text"]:focus{
+    border-color:#168bb9;box-shadow:0 0 0 2px #16cce833;
+}
+
+.drop-zone{
+    display:flex;flex-direction:column;align-items:center;
+    justify-content:center;gap:10px;min-height:110px;padding:18px;
+    border:3px dashed #75c9d5;background:#f0feff;
+    cursor:pointer;transition:.18s;text-align:center;
+    color:#39718b;font-size:.9rem;
+}
+.drop-zone:hover,.drop-zone.over{border-color:#078bb9;background:#d8fbff;}
+.drop-zone.has-file{border-color:#2ab36d;background:#eafff1;color:#167642;}
+.drop-icon{font-size:2.4rem;line-height:1;}
+.drop-zone input{display:none;}
+
+.analyze-btn{
+    display:block;width:100%;margin-top:18px;padding:12px;
+    cursor:pointer;border:2px solid;
+    border-color:white var(--dark) var(--dark) white;
+    color:white;
+    background:linear-gradient(#64e29d,#2ab36d 48%,#16834d 52%,#52ce8a);
+    box-shadow:0 4px #0559803d,inset 0 1px white;
+    font:bold 1rem "Trebuchet MS",Arial,sans-serif;
+    text-shadow:0 1px 2px #00442a66;transition:.16s ease;
+}
+.analyze-btn:hover {filter:brightness(1.08);transform:translateY(-1px);}
+.analyze-btn:active{border-color:var(--dark) white white var(--dark);
+    box-shadow:none;transform:translateY(3px);}
+.analyze-btn:disabled{opacity:.55;cursor:not-allowed;transform:none;filter:none;}
+
+.msg{
+    display:none;margin-top:12px;padding:8px 12px;
+    border:2px solid;border-color:#808080 white white #808080;
+    background:#d8ffff;color:#20516b;font:.8rem Tahoma,sans-serif;
+}
+.msg.show{display:block;}
+.msg.err {background:#fff0f0;color:#8b0000;
+    border-color:#e08080 white white #e08080;}
+
+.footer{margin-top:20px;color:#15547eaa;font-size:.72rem;text-align:center;}
+
+@media(max-width:600px){
+    body{padding:10px 7px;}
+    .panel{padding:22px 10px 28px;}
+    .controls{display:none;}
+}
+</style>
+</head>
+
+<body>
+<div class="bubble b1"></div>
+<div class="bubble b2"></div>
+<div class="bubble b3"></div>
+<div class="bubble b4"></div>
+
+<main class="page">
+<section class="window">
+
+  <header class="titlebar">
+    <div class="title-text">
+      <span class="title-icon">R</span>
+      <span>Rezzi Resume Assistant</span>
+    </div>
+    <div class="controls" aria-hidden="true">
+      <span class="control">_</span>
+      <span class="control">□</span>
+      <span class="control">×</span>
+    </div>
+  </header>
+
+  <div class="window-body">
+  <section class="panel">
+
+    <div class="brand">Resume Analysis Assistant</div>
+    <h1>Welcome to Rezzi!</h1>
+    <p class="subtitle">
+      Upload your PDF resume. Rezzi will scrape real job postings,
+      compare your qualifications, and score your fit.
+    </p>
+
+    <!-- Job title (optional) -->
+    <div class="field">
+      <label for="job-input">
+        Target job title
+        <span style="opacity:.55;font-weight:400;text-transform:none">
+          — optional, auto-detected if left blank
+        </span>
+      </label>
+      <input
+        type="text"
+        id="job-input"
+        placeholder="e.g. Software Engineer, Registered Nurse, Data Analyst…"
+      >
+    </div>
+
+    <!-- PDF drop zone -->
+    <div class="field">
+      <label>Resume PDF</label>
+      <div
+        class="drop-zone"
+        id="drop-zone"
+        onclick="document.getElementById('file-input').click()"
+        ondragover="onDragOver(event)"
+        ondragleave="onDragLeave(event)"
+        ondrop="onDrop(event)"
+        role="button"
+        tabindex="0"
+        aria-label="Click or drag your PDF resume here"
+      >
+        <span class="drop-icon">📄</span>
+        <span id="drop-label">Click or drag your PDF resume here</span>
+        <input type="file" id="file-input" accept=".pdf" onchange="onFileChange()">
+      </div>
+    </div>
+
+    <button class="analyze-btn" id="analyze-btn" onclick="startAnalysis()">
+      Analyze Resume
+    </button>
+
+    <div class="msg" id="msg"></div>
+
+    <div class="footer">Rezzi helps you discover your next step.</div>
+
+  </section>
+  </div>
+
+</section>
+</main>
+
+<script>
+const dropZone  = document.getElementById("drop-zone");
+const fileInput = document.getElementById("file-input");
+const dropLabel = document.getElementById("drop-label");
+const analyzeBtn= document.getElementById("analyze-btn");
+const msgEl     = document.getElementById("msg");
+
+/* ── Drag-and-drop ──────────────────────────────────────────────────── */
+function onDragOver(e) {
+    e.preventDefault();
+    dropZone.classList.add("over");
+}
+function onDragLeave() {
+    dropZone.classList.remove("over");
+}
+function onDrop(e) {
+    e.preventDefault();
+    dropZone.classList.remove("over");
+    const f = e.dataTransfer.files[0];
+    if (f) applyFile(f);
+}
+function onFileChange() {
+    if (fileInput.files[0]) applyFile(fileInput.files[0]);
+}
+
+function applyFile(f) {
+    if (!f.name.toLowerCase().endsWith(".pdf")) {
+        showMsg("Only PDF files are accepted.", true);
+        return;
+    }
+    const dt = new DataTransfer();
+    dt.items.add(f);
+    fileInput.files = dt.files;
+    dropLabel.textContent = `✓ ${f.name}  (${(f.size/1024).toFixed(0)} KB)`;
+    dropZone.classList.add("has-file");
+    hideMsg();
+}
+
+/* ── Submit ─────────────────────────────────────────────────────────── */
+async function startAnalysis() {
+    if (!fileInput.files || !fileInput.files[0]) {
+        showMsg("Please select a PDF resume first.", true);
+        return;
+    }
+
+    analyzeBtn.disabled = true;
+    showMsg("Uploading and starting analysis…");
+
+    const form = new FormData();
+    form.append("myFile",    fileInput.files[0]);
+    form.append("job_title", document.getElementById("job-input").value.trim());
+
+    try {
+        const resp = await fetch("/api/upload", { method:"POST", body:form });
+        const data = await resp.json();
+
+        if (!resp.ok) {
+            showMsg(data.error || "Upload failed.", true);
+            analyzeBtn.disabled = false;
+            return;
+        }
+
+        showMsg(`Detected role: "${data.job_title}". Redirecting to analysis…`);
+        setTimeout(() => { window.location.href = "/loading"; }, 1100);
+
+    } catch (err) {
+        showMsg("Could not reach the server. Is Rezzi running on port 5000?", true);
+        analyzeBtn.disabled = false;
+    }
+}
+
+function showMsg(text, isErr = false) {
+    msgEl.textContent = text;
+    msgEl.className   = "msg show" + (isErr ? " err" : "");
+}
+function hideMsg() {
+    msgEl.className = "msg";
+}
+
+/* ── Keyboard accessibility for drop zone ─────────────────────────── */
+dropZone.addEventListener("keydown", e => {
+    if (e.key === "Enter" || e.key === " ") fileInput.click();
+});
+</script>
+</body>
+</html>

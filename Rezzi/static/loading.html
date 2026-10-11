@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rezzi — Analyzing…</title>
+<style>
+:root{--gray:#c0c0c0;--dark:#404040;--blue:#075b9d;--ink:#082f4d;}
+*{box-sizing:border-box;}
+
+body{
+    min-height:100vh;margin:0;padding:25px 12px;overflow-x:hidden;
+    color:var(--ink);font-family:"Trebuchet MS",Arial,sans-serif;
+    background:
+        radial-gradient(circle at 15% 12%,#ffffff65,transparent 24%),
+        radial-gradient(circle at 88% 82%,#00f5ff66,transparent 32%),
+        linear-gradient(135deg,#076e9d,#12b9dc 45%,#13e8ed);
+    animation:glow 12s ease-in-out infinite alternate;
+}
+@keyframes glow{
+    from{background-position:0 0,100% 100%,0 50%;}
+    to  {background-position:8% 4%,92% 94%,100% 50%;}
+}
+body::before{
+    content:"";position:fixed;z-index:-5;inset:-10% auto -10% -8%;
+    width:58%;opacity:.3;pointer-events:none;
+    background:repeating-linear-gradient(58deg,
+        transparent 0 70px,#dffaff 70px 105px,transparent 105px 165px);
+    clip-path:polygon(0 0,100% 0,88% 100%,0 100%);
+}
+.bubble{
+    position:fixed;z-index:-2;border:2px solid #ffffff88;border-radius:50%;
+    pointer-events:none;opacity:.6;
+    background:radial-gradient(circle at 28% 23%,#ffffffd9,
+        #ffffff33 18%,#4be8ff2e 55%,#ffffff0a 75%);
+    box-shadow:inset -15px -18px 25px #005b9d24,0 12px 30px #00417826;
+    animation:float 11s ease-in-out infinite;
+}
+.bubble::before{
+    content:"";position:absolute;top:17%;left:18%;
+    width:27%;height:12%;border-radius:50%;
+    background:#ffffff99;transform:rotate(-35deg);
+}
+.b1{width:130px;height:130px;left:4%;bottom:13%;}
+.b2{width:62px;height:62px;left:25%;bottom:8%;opacity:.45;animation-delay:2s;}
+.b3{width:96px;height:96px;right:7%;top:18%;animation-delay:1s;}
+.b4{width:38px;height:38px;right:23%;bottom:24%;opacity:.4;animation-delay:3s;}
+@keyframes float{50%{transform:translate(8px,-18px);}}
+
+.page{width:min(100%,700px);margin:auto;}
+.window{
+    overflow:hidden;border:2px solid var(--dark);background:var(--gray);
+    box-shadow:3px 3px #000,0 20px 50px #002d5a4d;
+    animation:enter .7s ease-out both;
+}
+@keyframes enter{
+    from{opacity:0;transform:translateY(12px) scale(.985);}
+    to  {opacity:1;transform:translateY(0)    scale(1);   }
+}
+.titlebar{
+    display:flex;align-items:center;justify-content:space-between;
+    min-height:34px;padding:4px 7px;color:white;
+    background:linear-gradient(to right,#064c96,#169bd1 65%,#0a62a9);
+    font:bold .9rem Tahoma,sans-serif;
+}
+.title-text{display:flex;align-items:center;gap:8px;}
+.title-icon{
+    display:grid;width:19px;height:19px;place-items:center;
+    border:1px solid white;border-radius:3px;
+    color:var(--blue);background:linear-gradient(#fff,#a5f6ff);
+    font-size:.75rem;
+}
+.controls{display:flex;gap:3px;}
+.control{
+    display:grid;width:22px;height:20px;place-items:center;
+    border:2px solid;border-color:white var(--dark) var(--dark) white;
+    color:#000;background:var(--gray);font:bold .75rem Arial;
+}
+.window-body{padding:8px;}
+.panel{
+    padding:30px clamp(14px,5vw,52px) 38px;
+    border:2px solid;border-color:#808080 white white #808080;
+    background:linear-gradient(145deg,#fffffff2,#ddfff4f0);
+}
+.brand{
+    color:var(--blue);font-size:.75rem;font-weight:bold;
+    letter-spacing:.2em;text-align:center;text-transform:uppercase;
+}
+h1{
+    margin:8px 0 0;color:#087caf;
+    font-size:clamp(2rem,6vw,3.5rem);
+    line-height:.95;letter-spacing:-.09em;text-align:center;
+    text-shadow:0 3px white,0 5px #006c9d29;
+}
+.subtitle{
+    max-width:580px;margin:14px auto 22px;
+    color:#39718b;line-height:1.5;text-align:center;font-size:.95rem;
+}
+
+/* ── Pong canvas ─────────────────────────────────────────────────── */
+.pong-wrap{
+    border:2px solid;border-color:#808080 white white #808080;
+    background:#000;display:flex;justify-content:center;
+    line-height:0;
+}
+#pongCanvas{display:block;max-width:100%;cursor:none;}
+
+/* ── Status bar ──────────────────────────────────────────────────── */
+.status-bar{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+.status-bar span{
+    flex:1 1 200px;padding:5px 8px;
+    border:2px solid;border-color:#808080 white white #808080;
+    color:#20516b;background:#d8ffff;font:.76rem Tahoma,sans-serif;
+}
+
+#error-box{
+    display:none;margin-top:12px;padding:10px 12px;
+    border:2px solid #e08080;background:#fff0f0;
+    color:#8b0000;font:.85rem Tahoma,sans-serif;
+}
+#error-box a{color:inherit;font-weight:bold;}
+
+.footer{margin-top:20px;color:#15547eaa;font-size:.72rem;text-align:center;}
+
+@media(max-width:600px){
+    body{padding:10px 7px;}
+    .panel{padding:22px 10px 28px;}
+    .controls{display:none;}
+}
+</style>
+</head>
+
+<body>
+<div class="bubble b1"></div>
+<div class="bubble b2"></div>
+<div class="bubble b3"></div>
+<div class="bubble b4"></div>
+
+<main class="page">
+<section class="window">
+
+  <header class="titlebar">
+    <div class="title-text">
+      <span class="title-icon">R</span>
+      <span>Rezzi — Analyzing Your Resume</span>
+    </div>
+    <div class="controls" aria-hidden="true">
+      <span class="control">_</span>
+      <span class="control">□</span>
+      <span class="control">×</span>
+    </div>
+  </header>
+
+  <div class="window-body">
+  <section class="panel">
+
+    <div class="brand">Please wait</div>
+    <h1>Analyzing…</h1>
+    <p class="subtitle">
+      Rezzi is scraping job postings and comparing your resume with Gemini.
+      Play some Pong while you wait!
+      <br><small style="opacity:.65">Move your mouse over the canvas to control the left paddle.</small>
+    </p>
+
+    <div class="pong-wrap">
+      <canvas id="pongCanvas" width="560" height="280"></canvas>
+    </div>
+
+    <div class="status-bar">
+      <span>Connection: Local server</span>
+      <span id="status-text">Status: Starting…</span>
+    </div>
+
+    <div id="error-box"></div>
+    <div class="footer">Rezzi helps you discover your next step.</div>
+
+  </section>
+  </div>
+
+</section>
+</main>
+
+<script>
+/* ════════════════════════════════════════════════════════
+   Pong
+   ════════════════════════════════════════════════════════ */
+const cv  = document.getElementById("pongCanvas");
+const ctx = cv.getContext("2d");
+
+let bx = cv.width/2, by = cv.height/2, bdx = 4, bdy = 3.5;
+const PH = 64, PW = 10;
+let p1y = (cv.height-PH)/2, p2y = (cv.height-PH)/2;
+
+cv.addEventListener("mousemove", e => {
+    const r = cv.getBoundingClientRect();
+    p1y = e.clientY - r.top - PH/2;
+    p1y = Math.max(0, Math.min(cv.height-PH, p1y));
+});
+
+function movePong() {
+    /* AI paddle */
+    const mid = p2y + PH/2;
+    if (mid < by - 10) p2y = Math.min(p2y+4, cv.height-PH);
+    else if (mid > by + 10) p2y = Math.max(p2y-4, 0);
+
+    bx += bdx; by += bdy;
+
+    if (bx <= PW) {
+        if (by > p1y && by < p1y+PH) {
+            bdx = Math.abs(bdx);
+            bdy = (by - (p1y+PH/2)) * 0.22;
+        } else if (bx < 0) resetBall();
+    }
+    if (bx >= cv.width-PW) {
+        if (by > p2y && by < p2y+PH) {
+            bdx = -Math.abs(bdx);
+            bdy = (by - (p2y+PH/2)) * 0.22;
+        } else if (bx > cv.width) resetBall();
+    }
+    if (by <= 0 || by >= cv.height) bdy = -bdy;
+}
+function resetBall() {
+    bx = cv.width/2; by = cv.height/2; bdy = 3.5; bdx = -bdx;
+}
+function drawPong() {
+    ctx.fillStyle = "#000"; ctx.fillRect(0,0,cv.width,cv.height);
+    /* net */
+    ctx.fillStyle = "#ffffff30";
+    for (let i=0; i<cv.height; i+=20) ctx.fillRect(cv.width/2-1,i,2,10);
+    /* paddles */
+    ctx.fillStyle = "#a5f6ff";
+    ctx.fillRect(0, p1y, PW, PH);
+    ctx.fillRect(cv.width-PW, p2y, PW, PH);
+    /* ball */
+    ctx.beginPath();
+    ctx.arc(bx, by, 7, 0, Math.PI*2);
+    ctx.fill();
+}
+(function pongLoop(){ movePong(); drawPong(); requestAnimationFrame(pongLoop); })();
+
+/* ════════════════════════════════════════════════════════
+   Status polling
+   ════════════════════════════════════════════════════════ */
+const statusEl = document.getElementById("status-text");
+const errorBox = document.getElementById("error-box");
+
+const STATUS_MSGS = [
+    "Scraping job postings",
+    "Extracting requirements",
+    "Comparing with your resume",
+    "Asking Gemini for insights",
+    "Finalising analysis",
+];
+let phase = 0, dots = 0;
+
+const ticker = setInterval(() => {
+    dots = (dots+1) % 4;
+    if (dots === 0) phase = (phase+1) % STATUS_MSGS.length;
+    statusEl.textContent = "Status: " + STATUS_MSGS[phase] + ".".repeat(dots+1);
+}, 700);
+
+async function poll() {
+    try {
+        const r    = await fetch("/api/status");
+        const data = await r.json();
+
+        if (data.status === "done") {
+            clearInterval(ticker);
+            statusEl.textContent = "Status: Complete! Redirecting…";
+            setTimeout(() => { window.location.href = "/interact"; }, 900);
+            return;
+        }
+        if (data.status === "error") {
+            clearInterval(ticker);
+            statusEl.textContent = "Status: Error.";
+            errorBox.style.display = "block";
+            errorBox.innerHTML =
+                "<strong>Analysis failed:</strong> " +
+                (data.error || "Unknown error.") +
+                '<br><a href="/">← Try again</a>';
+            return;
+        }
+        setTimeout(poll, 2500);
+    } catch {
+        setTimeout(poll, 5000);
+    }
+}
+
+poll();
+</script>
+</body>
+</html>

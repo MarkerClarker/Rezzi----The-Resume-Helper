@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rezzi Chatbot</title>
+<style>
+:root{--gray:#c0c0c0;--dark:#404040;--blue:#075b9d;--ink:#082f4d;}
+*{box-sizing:border-box;}
+
+body{
+    min-height:100vh;margin:0;padding:12px;overflow:hidden;
+    color:var(--ink);font-family:"Trebuchet MS",Arial,sans-serif;
+    background:linear-gradient(135deg,#076e9d,#12b9dc 45%,#13e8ed);
+    animation:bg 12s ease-in-out infinite alternate;
+}
+@keyframes bg{to{background-position:100% 50%;}}
+
+body::before{
+    content:"";position:fixed;z-index:-3;inset:-10% auto -10% -8%;
+    width:55%;opacity:.3;pointer-events:none;
+    background:repeating-linear-gradient(58deg,
+        transparent 0 65px,#dffaff 65px 100px,transparent 100px 155px);
+    clip-path:polygon(0 0,100% 0,88% 100%,0 100%);
+}
+.bubble{
+    position:fixed;z-index:-2;border:2px solid #ffffff88;border-radius:50%;
+    pointer-events:none;
+    background:radial-gradient(circle at 28% 23%,#ffffffd9,
+        #ffffff33 18%,#4be8ff2e 55%,#ffffff0a 75%);
+    box-shadow:inset -12px -15px 20px #005b9d24,0 10px 25px #00417826;
+    animation:float 10s ease-in-out infinite;
+}
+.bubble::before{
+    content:"";position:absolute;top:17%;left:18%;
+    width:27%;height:12%;border-radius:50%;
+    background:#ffffff99;transform:rotate(-35deg);
+}
+.bubble-one  {width:100px;height:100px;left:3%;bottom:12%;}
+.bubble-two  {width:48px;height:48px;left:25%;bottom:7%;opacity:.45;animation-delay:2s;}
+.bubble-three{width:72px;height:72px;right:6%;top:15%;animation-delay:1s;}
+.bubble-four {width:28px;height:28px;right:22%;bottom:23%;opacity:.4;animation-delay:3s;}
+@keyframes float{50%{transform:translate(8px,-18px);}}
+
+.page{width:min(100%,950px);margin:auto;}
+.window{
+    overflow:hidden;border:2px solid var(--dark);background:var(--gray);
+    box-shadow:3px 3px #000,0 18px 45px #002d5a55;
+}
+.title-bar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:5px 7px;color:#fff;
+    background:linear-gradient(90deg,#064c96,#169bd1 65%,#0a62a9);
+    font:bold .88rem Tahoma,sans-serif;
+}
+.title-text{display:flex;align-items:center;gap:8px;}
+.title-icon{
+    display:grid;width:19px;height:19px;place-items:center;
+    border:1px solid #fff;border-radius:3px;
+    color:var(--blue);background:linear-gradient(#fff,#a5f6ff);
+    font-size:.75rem;
+}
+.controls{display:flex;gap:3px;}
+.control{
+    display:grid;width:22px;height:20px;place-items:center;
+    border:2px solid;border-color:#fff var(--dark) var(--dark) #fff;
+    color:#000;background:var(--gray);font:bold .75rem Arial,sans-serif;
+}
+.window-body{padding:8px;}
+.panel{
+    padding:25px clamp(10px,5vw,45px) 28px;
+    border:2px solid;border-color:#808080 #fff #fff #808080;
+    background:linear-gradient(145deg,#fffffff2,#ddfff4f0);
+}
+.brand{
+    color:var(--blue);font-size:.72rem;font-weight:bold;
+    letter-spacing:.2em;text-align:center;text-transform:uppercase;
+}
+h1{
+    margin:8px 0;color:#087caf;
+    font-size:clamp(2.2rem,7vw,4.5rem);
+    line-height:.95;letter-spacing:-.09em;text-align:center;
+    text-shadow:0 3px #fff,0 5px #006c9d29;
+}
+.subtitle{margin:12px auto 20px;color:#39718b;line-height:1.4;text-align:center;}
+
+.chat{
+    border:2px solid;border-color:#808080 #fff #fff #808080;background:#f4ffff;
+}
+.chat-header{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:9px 12px;color:#fff;
+    background:linear-gradient(#42d8eb,#078bb9);
+    font-size:.84rem;font-weight:bold;
+}
+.online{font-size:.7rem;white-space:nowrap;}
+.dot{
+    display:inline-block;width:8px;height:8px;margin-right:5px;
+    border:1px solid #fff;border-radius:50%;
+    background:#6effa5;box-shadow:0 0 6px #6effa5;
+}
+
+#messages{
+    display:flex;flex-direction:column;align-items:flex-start;
+    height:min(50vh,480px);padding:16px;overflow-y:auto;background:#f5ffff;
+}
+.message{
+    display:block;width:fit-content !important;
+    max-width:min(68%,560px) !important;
+    flex:0 0 auto;margin:9px 0;padding:11px 14px;
+    border:2px solid;border-radius:13px;color:#123f5b;
+    font-size:.95rem;line-height:1.45;text-align:left;
+    white-space:pre-wrap;overflow-wrap:anywhere;
+    box-shadow:2px 2px #0059802b;
+}
+.message.ai  {
+    align-self:flex-start;
+    border-color:#74c9d5 #558d99 #558d99 #74c9d5;
+    background:linear-gradient(145deg,#fff,#d8fbff);
+}
+.message.user{
+    align-self:flex-end;
+    border-color:#75d696 #328650 #328650 #75d696;
+    background:linear-gradient(145deg,#eafff1,#a8eec4);
+}
+.label{
+    display:block;margin-bottom:6px;color:#23728d;font-size:.68rem;
+    font-weight:bold;letter-spacing:.04em;line-height:1;text-transform:uppercase;
+}
+.user .label{color:#167642;}
+#typing{display:none;width:fit-content !important;color:#39718b;background:#d8ffff;font-style:italic;}
+
+.composer{
+    display:flex;gap:8px;padding:10px;
+    border-top:2px solid #70c9d9;background:var(--gray);
+}
+textarea{
+    flex:1;min-width:0;resize:none;padding:10px;outline:none;
+    border:2px solid;border-color:#808080 #fff #fff #808080;
+    color:var(--ink);background:#fff;
+    font:.9rem "Trebuchet MS",Arial,sans-serif;
+}
+textarea:focus{border-color:#168bb9;box-shadow:0 0 0 2px #16cce833;}
+
+button{
+    padding:9px 16px;cursor:pointer;border:2px solid;
+    border-color:#fff var(--dark) var(--dark) #fff;color:#064d78;
+    background:linear-gradient(#fff,#a7f3ff 48%,#63d4ec 52%,#dffcff);
+    box-shadow:0 3px #0559803d;font:bold .85rem "Trebuchet MS",Arial,sans-serif;
+}
+button:hover {filter:brightness(1.08);}
+button:active{border-color:var(--dark) #fff #fff var(--dark);box-shadow:none;}
+button:disabled{cursor:wait;opacity:.65;}
+
+.send-btn{
+    color:#fff;
+    background:linear-gradient(#64e29d,#2ab36d 48%,#16834d 52%,#52ce8a);
+}
+
+.bottom{
+    display:flex;align-items:center;justify-content:space-between;
+    flex-wrap:wrap;gap:10px;margin-top:10px;
+    color:#20516b;font:.72rem Tahoma,sans-serif;
+}
+.bottom-btns{display:flex;gap:8px;}
+
+.footer{margin-top:16px;color:#15547eaa;font-size:.72rem;text-align:center;}
+
+@media(max-width:600px){
+    body{padding:7px;}
+    .panel{padding:23px 8px;}
+    .controls{display:none;}
+    .chat-header{align-items:flex-start;flex-direction:column;gap:4px;}
+    #messages{height:52vh;padding:10px;}
+    .message{max-width:88% !important;}
+    .composer{flex-direction:column;}
+    .send-btn{width:100%;}
+    .bottom{align-items:flex-start;flex-direction:column;}
+}
+</style>
+</head>
+
+<body>
+<div class="bubble bubble-one"></div>
+<div class="bubble bubble-two"></div>
+<div class="bubble bubble-three"></div>
+<div class="bubble bubble-four"></div>
+
+<main class="page">
+<section class="window">
+
+  <header class="title-bar">
+    <div class="title-text">
+      <span class="title-icon">R</span>
+      <span>Rezzi Career Chatbot</span>
+    </div>
+    <div class="controls" aria-hidden="true">
+      <span class="control">_</span>
+      <span class="control">□</span>
+      <span class="control">×</span>
+    </div>
+  </header>
+
+  <div class="window-body">
+  <section class="panel">
+
+    <div class="brand">Career conversation center</div>
+    <h1>Rezzi Chat</h1>
+    <p class="subtitle">
+      Ask questions about your career, resume, skills, and job requirements.
+    </p>
+
+    <section class="chat">
+      <div class="chat-header">
+        <span>Rezzi AI · Career Coach</span>
+        <span class="online">
+          <span class="dot"></span>
+          Resume connected
+        </span>
+      </div>
+
+      <div id="messages">
+        <div class="message ai">
+          <span class="label">Rezzi</span>
+          Hi! I can answer questions using your uploaded resume. How can I help?
+        </div>
+        <div id="typing" class="message ai">
+          <span class="label">Rezzi</span>
+          Rezzi is thinking…
+        </div>
+      </div>
+
+      <form id="chat-form" class="composer">
+        <textarea id="msg-input" rows="2"
+          placeholder="Ask about your resume, skills, or career…" required></textarea>
+        <button id="send-btn" class="send-btn" type="submit">Send</button>
+      </form>
+    </section>
+
+    <div class="bottom">
+      <span id="status">Status: Ready</span>
+      <div class="bottom-btns">
+        <button id="clear-btn" type="button">Clear Chat</button>
+        <a class="button" href="/interact" style="min-width:auto;padding:9px 14px;">
+          ← Results
+        </a>
+      </div>
+    </div>
+
+    <div class="footer">Rezzi helps you discover your next step.</div>
+
+  </section>
+  </div>
+
+</section>
+</main>
+
+<script>
+const form      = document.getElementById("chat-form");
+const input     = document.getElementById("msg-input");
+const messages  = document.getElementById("messages");
+const typing    = document.getElementById("typing");
+const statusEl  = document.getElementById("status");
+const sendBtn   = document.getElementById("send-btn");
+const clearBtn  = document.getElementById("clear-btn");
+
+let history = [];
+
+function addMessage(text, role) {
+    const box   = document.createElement("div");
+    box.className = `message ${role}`;
+    const lbl   = document.createElement("span");
+    lbl.className = "label";
+    lbl.textContent = role === "user" ? "You" : "Rezzi";
+    box.append(lbl, document.createTextNode(text));
+    messages.insertBefore(box, typing);
+    messages.scrollTop = messages.scrollHeight;
+}
+
+form.addEventListener("submit", async e => {
+    e.preventDefault();
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    addMessage(msg, "user");
+    const prevHistory = [...history];
+    history.push({ role: "user", text: msg });
+    input.value = "";
+    input.disabled = sendBtn.disabled = true;
+    typing.style.display = "block";
+    messages.scrollTop = messages.scrollHeight;
+    statusEl.textContent = "Status: Rezzi is thinking…";
+
+    try {
+        const r = await fetch("/chat", {
+            method:  "POST",
+            headers: { "Content-Type": "application/json" },
+            body:    JSON.stringify({ message: msg, history: prevHistory }),
+        });
+        const data = await r.json();
+        if (!r.ok) throw new Error(data.error || `HTTP ${r.status}`);
+
+        const reply = data.response || "I could not generate a response.";
+        typing.style.display = "none";
+        addMessage(reply, "ai");
+        history.push({ role: "assistant", text: reply });
+        statusEl.textContent = "Status: Ready";
+
+    } catch (err) {
+        typing.style.display = "none";
+        addMessage(`Connection error: ${err.message}`, "ai");
+        statusEl.textContent = "Status: Connection problem";
+    } finally {
+        input.disabled = sendBtn.disabled = false;
+        input.focus();
+    }
+});
+
+clearBtn.addEventListener("click", () => {
+    history = [];
+    messages.innerHTML = "";
+    const welcome = document.createElement("div");
+    welcome.className = "message ai";
+    const lbl = document.createElement("span");
+    lbl.className = "label"; lbl.textContent = "Rezzi";
+    welcome.append(lbl, document.createTextNode(
+        "Chat cleared. What would you like to discuss?"
+    ));
+    messages.append(welcome, typing);
+    statusEl.textContent = "Status: Ready";
+});
+
+input.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        form.requestSubmit();
+    }
+});
+</script>
+</body>
+</html>

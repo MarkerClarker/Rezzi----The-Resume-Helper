@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rezzi — Results</title>
+<style>
+:root{--gray:#c0c0c0;--light:#fff;--shadow:#808080;--dark:#404040;--blue:#075b9d;--ink:#082f4d;}
+*{box-sizing:border-box;}
+
+body{
+    min-height:100vh;margin:0;padding:25px 12px;overflow-x:hidden;
+    color:var(--ink);font-family:"Trebuchet MS",Arial,sans-serif;
+    background:
+        radial-gradient(circle at 15% 12%,#ffffff65,transparent 24%),
+        radial-gradient(circle at 88% 82%,#00f5ff66,transparent 32%),
+        linear-gradient(135deg,#076e9d,#12b9dc 45%,#13e8ed);
+    animation:glow 12s ease-in-out infinite alternate;
+}
+@keyframes glow{
+    from{background-position:0 0,100% 100%,0 50%;}
+    to  {background-position:8% 4%,92% 94%,100% 50%;}
+}
+body::before{
+    content:"";position:fixed;z-index:-5;inset:-10% auto -10% -8%;
+    width:58%;opacity:.3;pointer-events:none;
+    background:repeating-linear-gradient(58deg,
+        transparent 0 70px,#dffaff 70px 105px,transparent 105px 165px);
+    clip-path:polygon(0 0,100% 0,88% 100%,0 100%);
+}
+.bubble{
+    position:fixed;z-index:-2;border:2px solid #ffffff88;border-radius:50%;
+    pointer-events:none;opacity:.6;
+    background:radial-gradient(circle at 28% 23%,#ffffffd9,
+        #ffffff33 18%,#4be8ff2e 55%,#ffffff0a 75%);
+    box-shadow:inset -15px -18px 25px #005b9d24,0 12px 30px #00417826;
+    animation:float 11s ease-in-out infinite;
+}
+.bubble::before{
+    content:"";position:absolute;top:17%;left:18%;
+    width:27%;height:12%;border-radius:50%;
+    background:#ffffff99;transform:rotate(-35deg);
+}
+.b1{width:130px;height:130px;left:4%;bottom:13%;}
+.b2{width:62px;height:62px;left:25%;bottom:8%;opacity:.45;animation-delay:2s;}
+.b3{width:96px;height:96px;right:7%;top:18%;animation-delay:1s;}
+.b4{width:38px;height:38px;right:23%;bottom:24%;opacity:.4;animation-delay:3s;}
+@keyframes float{0%,100%{transform:translate(0,0);}50%{transform:translate(8px,-18px);}}
+
+.page{width:min(100%,980px);margin:auto;}
+.window{
+    overflow:hidden;border:2px solid var(--dark);background:var(--gray);
+    box-shadow:3px 3px #000,0 20px 50px #002d5a4d;
+    animation:enter .7s ease-out both;
+}
+@keyframes enter{
+    from{opacity:0;transform:translateY(12px) scale(.985);}
+    to  {opacity:1;transform:translateY(0)    scale(1);   }
+}
+.titlebar{
+    display:flex;align-items:center;justify-content:space-between;
+    min-height:34px;padding:4px 7px;color:white;
+    background:linear-gradient(to right,#064c96,#169bd1 65%,#0a62a9);
+    font:bold .9rem Tahoma,sans-serif;
+}
+.title-text{display:flex;align-items:center;gap:8px;}
+.title-icon{
+    display:grid;width:19px;height:19px;place-items:center;
+    border:1px solid white;border-radius:3px;
+    color:var(--blue);background:linear-gradient(#fff,#a5f6ff);
+    font-size:.75rem;
+}
+.controls{display:flex;gap:3px;}
+.control{
+    display:grid;width:22px;height:20px;place-items:center;
+    border:2px solid;border-color:white var(--dark) var(--dark) white;
+    color:#000;background:var(--gray);font:bold .75rem Arial;
+}
+.window-body{padding:8px;}
+.panel{
+    padding:30px clamp(14px,5vw,52px) 38px;
+    border:2px solid;border-color:var(--shadow) white white var(--shadow);
+    background:linear-gradient(145deg,#fffffff2,#ddfff4f0);
+}
+.brand{
+    color:var(--blue);font-size:.75rem;font-weight:bold;
+    letter-spacing:.2em;text-align:center;text-transform:uppercase;
+}
+h1{
+    margin:8px 0 0;color:#087caf;
+    font-size:clamp(2.4rem,7vw,4.6rem);
+    line-height:.95;letter-spacing:-.09em;text-align:center;
+    text-shadow:0 3px white,0 5px #006c9d29;
+}
+.subtitle{
+    max-width:650px;margin:18px auto 26px;
+    color:#39718b;line-height:1.5;text-align:center;
+}
+.chat{
+    border:2px solid;border-color:var(--shadow) white white var(--shadow);
+    background:#f4ffff;animation:chatGlow 5s ease-in-out infinite alternate;
+}
+@keyframes chatGlow{
+    from{box-shadow:0 0 0 #16cce800;}
+    to  {box-shadow:0 0 20px #16cce82a;}
+}
+.chat-head{
+    display:flex;justify-content:space-between;gap:10px;
+    padding:10px 14px;color:white;
+    background:linear-gradient(#42d8eb,#078bb9);
+    font-size:.88rem;font-weight:bold;
+    text-shadow:0 1px 2px #003c646b;
+}
+.online{display:flex;align-items:center;gap:6px;font-size:.72rem;}
+.dot{
+    width:9px;height:9px;border:1px solid white;border-radius:50%;
+    background:#6effa5;box-shadow:0 0 7px #6effa5;
+    animation:pulse 2.2s ease-in-out infinite;
+}
+@keyframes pulse{
+    0%,100%{opacity:.7;transform:scale(.9);}
+    50%    {opacity:1; transform:scale(1.15);}
+}
+
+#text-container{
+    min-height:350px;max-height:58vh;margin:0;padding:20px;
+    overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;
+    color:#123f5b;background:#f5ffff;
+    font:.96rem/1.65 "Trebuchet MS",Arial,sans-serif;
+}
+#text-container::-webkit-scrollbar{width:15px;}
+#text-container::-webkit-scrollbar-track{border:1px solid var(--shadow);background:#d7d7d7;}
+#text-container::-webkit-scrollbar-thumb{
+    border:2px solid;border-color:white #777 #777 white;background:#bdbdbd;
+}
+
+.status{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;}
+.status span{
+    flex:1 1 160px;padding:5px 8px;
+    border:2px solid;border-color:var(--shadow) white white var(--shadow);
+    color:#20516b;background:#d8ffff;font:.76rem Tahoma,sans-serif;
+}
+
+.buttons{display:flex;justify-content:center;gap:12px;margin-top:20px;}
+button,.button{
+    display:inline-flex;min-width:145px;align-items:center;
+    justify-content:center;padding:10px 18px;cursor:pointer;
+    border:2px solid;border-color:white var(--dark) var(--dark) white;
+    color:#064d78;
+    background:linear-gradient(#fff,#a7f3ff 48%,#63d4ec 52%,#dffcff);
+    box-shadow:0 4px #0559803d,inset 0 1px white;
+    font:bold .9rem "Trebuchet MS",Arial,sans-serif;
+    text-decoration:none;transition:.16s ease;
+}
+button:hover,.button:hover{filter:brightness(1.08);transform:translateY(-1px);}
+button:active,.button:active{
+    border-color:var(--dark) white white var(--dark);
+    box-shadow:none;transform:translateY(3px);
+}
+.primary{
+    color:white;
+    background:linear-gradient(#64e29d,#2ab36d 48%,#16834d 52%,#52ce8a);
+    text-shadow:0 1px 2px #00442a66;
+}
+
+.footer{margin-top:20px;color:#15547eaa;font-size:.75rem;text-align:center;}
+
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none !important;}}
+@media(max-width:620px){
+    body{padding:10px 7px;}
+    .panel{padding:26px 10px 32px;}
+    .controls{display:none;}
+    #text-container{min-height:290px;padding:15px;font-size:.9rem;}
+    .buttons{flex-direction:column;}
+    button,.button{width:100%;}
+}
+</style>
+</head>
+
+<body>
+<div class="bubble b1"></div>
+<div class="bubble b2"></div>
+<div class="bubble b3"></div>
+<div class="bubble b4"></div>
+
+<main class="page">
+<section class="window">
+
+  <header class="titlebar">
+    <div class="title-text">
+      <span class="title-icon">R</span>
+      <span>Rezzi Resume Assistant</span>
+    </div>
+    <div class="controls">
+      <span class="control">_</span>
+      <span class="control">□</span>
+      <span class="control">×</span>
+    </div>
+  </header>
+
+  <div class="window-body">
+  <section class="panel">
+
+    <div class="brand">Career analysis center</div>
+    <h1>Results</h1>
+    <p class="subtitle">
+      Your career assistant has finished reviewing your resume
+      and job requirements.
+    </p>
+
+    <section class="chat">
+      <div class="chat-head">
+        <span>Rezzi AI · Career Coach</span>
+        <span class="online">
+          <span class="dot"></span>
+          Analysis ready
+        </span>
+      </div>
+      <pre id="text-container">Loading your analysis…</pre>
+    </section>
+
+    <div class="status">
+      <span>Connection: Local server</span>
+      <span id="loading-status">Status: Loading report…</span>
+    </div>
+
+    <div class="buttons">
+      <a class="button" href="/">Start Over</a>
+      <a class="button" href="/chatbot">Chat with Rezzi</a>
+      <button class="primary" onclick="window.print()">Print Results</button>
+    </div>
+
+    <div class="footer">Rezzi helps you discover your next step.</div>
+
+  </section>
+  </div>
+
+</section>
+</main>
+
+<script>
+const container  = document.getElementById("text-container");
+const statusEl   = document.getElementById("loading-status");
+
+async function loadAnalysis() {
+    try {
+        const r = await fetch("/api/analysis");
+        if (r.ok) {
+            container.textContent = await r.text();
+            statusEl.textContent  = "Status: Report loaded.";
+            return;
+        }
+        /* If not ready yet (e.g. user navigated here early), retry */
+        const data = await r.json().catch(() => ({}));
+        if (data.error && r.status === 404) {
+            statusEl.textContent = "Status: Waiting for analysis…";
+            setTimeout(loadAnalysis, 3000);
+        } else {
+            container.textContent = data.error || "The analysis could not be loaded.";
+            statusEl.textContent  = "Status: Error.";
+        }
+    } catch {
+        statusEl.textContent = "Status: Connection problem.";
+        setTimeout(loadAnalysis, 5000);
+    }
+}
+
+loadAnalysis();
+</script>
+</body>
+</html>
